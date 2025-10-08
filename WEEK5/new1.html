@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Form with JavaScript Validation</title>
+  <style>
+    :root {
+      --bg: #0b1020;
+      --card: #121830;
+      --ink: #e8ecff;
+      --muted: #9aa4c7;
+      --accent: #6ea8ff;
+      --danger: #ff6b6b;
+      --success: #2ecc71;
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; font-family: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, Arial, "Apple Color Emoji", "Segoe UI Emoji"; background: linear-gradient(120deg, #0b1020, #111a39 60%, #0b1020); color: var(--ink); }
+    .wrap { min-height: 100vh; display: grid; place-items: center; padding: 24px; }
+    .card { width: 100%; max-width: 640px; background: var(--card); border-radius: 18px; box-shadow: 0 10px 40px rgba(0,0,0,.35); padding: 28px; }
+    h1 { margin: 0 0 8px; font-size: 1.75rem; letter-spacing: .3px; }
+    p.sub { margin: 0 0 22px; color: var(--muted); }
+    form { display: grid; gap: 16px; }
+
+    .row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    @media (max-width: 640px) { .row { grid-template-columns: 1fr; } }
+
+    label { display: block; font-weight: 600; margin: 0 0 6px; }
+    .field { position: relative; }
+    input, select { width: 100%; padding: 12px 14px; border: 1px solid transparent; border-radius: 12px; background: #0e1430; color: var(--ink); outline: none; transition: border-color .2s, box-shadow .2s; }
+    input::placeholder { color: #7d86a8; }
+    input:focus { border-color: var(--accent); box-shadow: 0 0 0 4px rgba(110,168,255,.15); }
+    input[aria-invalid="true"] { border-color: var(--danger); box-shadow: 0 0 0 4px rgba(255,107,107,.15); }
+
+    .helper { margin-top: 6px; font-size: .9rem; color: var(--muted); }
+    .error { margin-top: 6px; font-size: .9rem; color: var(--danger); min-height: 1.2em; }
+    .ok { color: var(--success); font-size: .85rem; }
+    .req { color: var(--accent); font-weight: 700; }
+
+    .terms { display: flex; align-items: start; gap: 10px; }
+    .terms input { width: auto; accent-color: var(--accent); }
+
+    .strength {
+      height: 8px; width: 100%; background: #0b1130; border-radius: 999px; overflow: hidden; margin-top: 8px;
+    }
+    .strength > div { height: 100%; width: 0%; background: var(--danger); transition: width .3s ease, background .3s ease; }
+
+    .actions { display: flex; gap: 12px; justify-content: flex-end; margin-top: 4px; }
+    button { border: 0; padding: 12px 16px; border-radius: 12px; font-weight: 700; cursor: pointer; }
+    .btn-primary { background: var(--accent); color: #0b1020; }
+    .btn-ghost { background: transparent; color: var(--ink); border: 1px solid #2b345a; }
+    button:disabled { opacity: .6; cursor: not-allowed; }
+
+    .note { margin-top: 10px; color: var(--muted); font-size: .9rem; text-align: center; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="card" role="region" aria-labelledby="title">
+      <h1 id="title">Create your account</h1>
+      <p class="sub">HTML5 + JavaScript validation with clear, accessible error messages.</p>
+
+      <form id="signupForm" novalidate>
+        <div class="row">
+          <div class="field">
+            <label for="firstName">First name <span class="req" aria-hidden="true">*</span></label>
+            <input id="firstName" name="firstName" type="text" placeholder="Ada" required minlength="2" maxlength="40" autocomplete="given-name" />
+            <div class="error" id="firstNameError" aria-live="polite"></div>
+          </div>
+          <div class="field">
+            <label for="lastName">Last name <span class="req" aria-hidden="true">*</span></label>
+            <input id="lastName" name="lastName" type="text" placeholder="Lovelace" required minlength="2" maxlength="40" autocomplete="family-name" />
+            <div class="error" id="lastNameError" aria-live="polite"></div>
+          </div>
+        </div>
+
+        <div class="field">
+          <label for="email">Email <span class="req" aria-hidden="true">*</span></label>
+          <input id="email" name="email" type="email" placeholder="you@example.com" required autocomplete="email" />
+          <div class="error" id="emailError" aria-live="polite"></div>
+        </div>
+
+        <div class="row">
+          <div class="field">
+            <label for="password">Password <span class="req" aria-hidden="true">*</span></label>
+            <input id="password" name="password" type="password" required minlength="8" placeholder="At least 8 characters" autocomplete="new-password" />
+            <div class="strength" aria-hidden="true"><div id="strengthBar"></div></div>
+            <div class="helper">Use upper & lower case, a number, and a symbol.</div>
+            <div class="error" id="passwordError" aria-live="polite"></div>
+          </div>
+          <div class="field">
+            <label for="confirm">Confirm password <span class="req" aria-hidden="true">*</span></label>
+            <input id="confirm" name="confirm" type="password" required autocomplete="new-password" />
+            <div class="error" id="confirmError" aria-live="polite"></div>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="field">
+            <label for="phone">Phone</label>
+            <input id="phone" name="phone" type="tel" placeholder="e.g. +31 6 1234 5678" pattern="^\+?[0-9\s\-()]{7,20}$" inputmode="tel" />
+            <div class="helper">Accepts digits, spaces, +, -, ( )</div>
+            <div class="error" id="phoneError" aria-live="polite"></div>
+          </div>
+          <div class="field">
+            <label for="age">Age</label>
+            <input id="age" name="age" type="number" min="13" max="120" placeholder="18" />
+            <div class="helper">Must be between 13 and 120.</div>
+            <div class="error" id="ageError" aria-live="polite"></div>
+          </div>
+        </div>
+
+        <div class="terms">
+          <input id="terms" name="terms" type="checkbox" required />
+          <label for="terms">I agree to the Terms & Privacy Policy <span class="req" aria-hidden="true">*</span></label>
+        </div>
+        <div class="error" id="termsError" aria-live="polite"></div>
+
+        <div class="actions">
+          <button type="reset" class="btn-ghost">Reset</button>
+          <button id="submitBtn" type="submit" class="btn-primary">Create account</button>
+        </div>
+
+        <p class="note">Client-side checks only. Always validate again on the server.</p>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    // Helpers
+    const $ = (sel, ctx = document) => ctx.querySelector(sel);
+    const $$ = (sel, ctx = document) => Array.from(ctx.querySelectorAll(sel));
+    const setError = (input, msg) => {
+      const errorEl = document.getElementById(input.id + 'Error');
+      input.setAttribute('aria-invalid', msg ? 'true' : 'false');
+      input.setCustomValidity(msg || '');
+      if (errorEl) errorEl.textContent = msg || '';
+    };
+
+    const validators = {
+      firstName: (el) => {
+        if (el.validity.valueMissing) return 'First name is required.';
+        if (el.value.trim().length < 2) return 'Please enter at least 2 characters.';
+        return '';
+      },
+      lastName: (el) => {
+        if (el.validity.valueMissing) return 'Last name is required.';
+        if (el.value.trim().length < 2) return 'Please enter at least 2 characters.';
+        return '';
+      },
+      email: (el) => {
+        if (el.validity.valueMissing) return 'Email is required.';
+        if (el.validity.typeMismatch) return 'Please enter a valid email address.';
+        return '';
+      },
+      password: (el) => {
+        if (el.validity.valueMissing) return 'Password is required.';
+        if (el.value.length < 8) return 'Must be at least 8 characters.';
+        const strongRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^\w\s]).{8,}$/;
+        if (!strongRegex.test(el.value)) return 'Add upper & lower case, a number, and a symbol.';
+        return '';
+      },
+      confirm: (el) => {
+        const pwd = $('#password').value;
+        if (el.validity.valueMissing) return 'Please confirm your password.';
+        if (el.value !== pwd) return 'Passwords do not match.';
+        return '';
+      },
+      phone: (el) => {
+        if (!el.value) return '';
+        const re = /^\+?[0-9\s\-()]{7,20}$/;
+        if (!re.test(el.value)) return 'Phone format looks invalid.';
+        return '';
+      },
+      age: (el) => {
+        if (!el.value) return '';
+        const n = Number(el.value);
+        if (Number.isNaN(n)) return 'Age must be a number.';
+        if (n < 13 || n > 120) return 'Age must be between 13 and 120.';
+        return '';
+      },
+      terms: (el) => {
+        if (!el.checked) return 'You must accept the terms to continue.';
+        return '';
+      }
+    };
+
+    // Live validation on input/blur
+    const form = document.getElementById('signupForm');
+    const submitBtn = document.getElementById('submitBtn');
+
+    const inputs = $$('#signupForm input');
+    inputs.forEach((el) => {
+      const type = el.type;
+      const handler = () => {
+        const fn = validators[el.name];
+        if (fn) setError(el, fn(el));
+        updateSubmitState();
+        if (el.name === 'password') updateStrength(el.value);
+        if (el.name === 'confirm') setError(el, validators.confirm(el));
+      };
+      el.addEventListener('input', handler);
+      el.addEventListener('blur', handler);
+      if (type === 'password' && el.name === 'password') el.addEventListener('keyup', handler);
+    });
+
+    // Password strength meter
+    const strengthBar = document.getElementById('strengthBar');
+    function updateStrength(value) {
+      const tests = [
+        /[a-z]/.test(value),
+        /[A-Z]/.test(value),
+        /\d/.test(value),
+        /[^\w\s]/.test(value),
+        value.length >= 12
+      ];
+      const score = tests.filter(Boolean).length; // 0..5
+      const width = (score / 5) * 100;
+      strengthBar.style.width = width + '%';
+      strengthBar.style.background = score >= 4 ? 'var(--success)' : score >= 3 ? 'orange' : 'var(--danger)';
+    }
+
+    function updateSubmitState() {
+      // Disable submit if any required field invalid
+      const required = ['firstName','lastName','email','password','confirm','terms'];
+      const invalid = required.some((name) => {
+        const el = document.getElementsByName(name)[0];
+        const fn = validators[name];
+        const msg = fn ? fn(el) : '';
+        setError(el, msg);
+        return Boolean(msg);
+      });
+      submitBtn.disabled = invalid;
+    }
+
+    // Handle submit
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      updateSubmitState();
+      const anyErrors = $$('#signupForm input').some((el) => el.getAttribute('aria-invalid') === 'true');
+      if (anyErrors) return; // don't submit
+
+      // Simulate success
+      alert('✅ Account created successfully! (Demo)');
+      form.reset();
+      updateStrength('');
+      $$('#signupForm .error').forEach(el => el.textContent = '');
+      $$('#signupForm input').forEach(el => el.removeAttribute('aria-invalid'));
+      submitBtn.disabled = false;
+    });
+
+    // Initialize
+    updateSubmitState();
+  </script>
+</body>
+</html>
