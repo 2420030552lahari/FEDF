@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Bubble Shooter</title>
+  <style>
+    body {
+      margin: 0;
+      background: #222;
+      color: white;
+      font-family: Arial, sans-serif;
+      text-align: center;
+    }
+    canvas {
+      background-color: #000;
+      border: 3px solid #fff;
+      margin-top: 20px;
+    }
+    h1 {
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Bubble Shooter</h1>
+  <canvas id="gameCanvas" width="480" height="640"></canvas>
+
+  <script>
+    const canvas = document.getElementById("gameCanvas");
+    const ctx = canvas.getContext("2d");
+
+    const shooter = {
+      x: canvas.width / 2,
+      y: canvas.height - 20,
+      angle: 0
+    };
+
+    let currentBubble = createBubble();
+    let bubbles = [];
+
+    function createBubble() {
+      return {
+        x: shooter.x,
+        y: shooter.y,
+        radius: 10,
+        dx: Math.cos(shooter.angle) * 6,
+        dy: Math.sin(shooter.angle) * 6,
+        color: getRandomColor()
+      };
+    }
+
+    function getRandomColor() {
+      const colors = ["red", "blue", "green", "yellow", "purple", "orange"];
+      return colors[Math.floor(Math.random() * colors.length)];
+    }
+
+    function drawShooter() {
+      ctx.beginPath();
+      ctx.moveTo(shooter.x, shooter.y);
+      ctx.lineTo(
+        shooter.x + Math.cos(shooter.angle) * 30,
+        shooter.y + Math.sin(shooter.angle) * 30
+      );
+      ctx.strokeStyle = "white";
+      ctx.lineWidth = 2;
+      ctx.stroke();
+    }
+
+    function drawBubble(bubble) {
+      ctx.beginPath();
+      ctx.arc(bubble.x, bubble.y, bubble.radius, 0, Math.PI * 2);
+      ctx.fillStyle = bubble.color;
+      ctx.fill();
+    }
+
+    function update() {
+      if (currentBubble) {
+        currentBubble.x += currentBubble.dx;
+        currentBubble.y += currentBubble.dy;
+
+        if (currentBubble.x < 0 || currentBubble.x > canvas.width) {
+          currentBubble.dx *= -1;
+        }
+
+        if (currentBubble.y < 0) {
+          bubbles.push(currentBubble);
+          currentBubble = null;
+        }
+      }
+    }
+
+    function draw() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      drawShooter();
+      if (currentBubble) drawBubble(currentBubble);
+      for (const bubble of bubbles) drawBubble(bubble);
+    }
+
+    function loop() {
+      update();
+      draw();
+      requestAnimationFrame(loop);
+    }
+
+    document.addEventListener("mousemove", (e) => {
+      const rect = canvas.getBoundingClientRect();
+      const mouseX = e.clientX - rect.left;
+      const mouseY = e.clientY - rect.top;
+      shooter.angle = Math.atan2(mouseY - shooter.y, mouseX - shooter.x);
+    });
+
+    document.addEventListener("click", () => {
+      if (!currentBubble) {
+        currentBubble = createBubble();
+      }
+    });
+
+    loop();
+  </script>
+</body>
+</html>
