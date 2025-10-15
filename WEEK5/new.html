@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Form with Validation</title>
+  <script>
+    function validateForm(event) {
+      event.preventDefault(); // prevent auto-submit
+      
+      const name = document.getElementById("name").value.trim();
+      const email = document.getElementById("email").value.trim();
+      let valid = true;
+      let errorMsg = "";
+
+      if (name === "") {
+        errorMsg += "⚠️ Name is required.\n";
+        valid = false;
+      }
+
+      // simple email regex
+      const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailPattern.test(email)) {
+        errorMsg += "⚠️ Please enter a valid email address.\n";
+        valid = false;
+      }
+
+      if (!valid) {
+        alert(errorMsg);
+      } else {
+        alert("✅ Form submitted successfully!");
+        document.getElementById("myForm").submit(); // manually submit
+      }
+    }
+  </script>
+</head>
+<body>
+  <form id="myForm" action="/submit" method="post" onsubmit="validateForm(event)">
+    <label for="name">Name:</label>
+    <input type="text" id="name" name="name" required>
+    <br><br>
+
+    <label for="email">Email:</label>
+    <input type="email" id="email" name="email" required>
+    <br><br>
+
+    <input type="submit" value="Submit">
+  </form>
+</body>
+</html>
